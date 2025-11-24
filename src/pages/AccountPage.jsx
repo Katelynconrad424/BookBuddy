@@ -1,35 +1,44 @@
-import { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { returnBook } from "../api/books";
+import { getReservations, returnBook } from "../api/reservations";
 
-function AccountPage() {
-  const { user, token } = useContext(AuthContext);
+export default function AccountPage() {
+  const { token } = useContext(AuthContext);
+  const [reservations, setReservations] = useState([]);
 
-  if (!token) return <p>Please log in or register.</p>;
-  if (!user) return <p>Loading user...</p>;
+  useEffect(() => {
+    async function fetchData() {
+      if (!token) return;
+      const data = await getReservations(token);
+      setReservations(data);
+    }
+    fetchData();
+  }, [token]);
 
-  async function handleReturn(id) {
-    await returnBook(id, token);
-    alert("Book returned!");
-  }
+  const handleReturn = async (bookId) => {
+    if (!token) return;
+    await returnBook(token, bookId);
+    setReservations(reservations.filter((r) => r.id !== bookId));
+  };
+
+  if (!token) return <p>Please log in to see your account.</p>;
 
   return (
     <div>
-      <h1>Your Account</h1>
-      <p>
-        Name: {user.firstname} {user.lastname}
-      </p>
-      <p>Email: {user.email}</p>
-
-      <h2>Your Reservations</h2>
-      {user.reservations?.map((r) => (
-        <div key={r.id}>
-          <p>{r.title}</p>
-          <button onClick={() => handleReturn(r.id)}>Return</button>
-        </div>
-      ))}
+      <h1>My Account</h1>
+      <h2>My Reservations</h2>
+      {reservations.length === 0 ? (
+        <p>No reservations yet.</p>
+      ) : (
+        <ul>
+          {reservations.map((r) => (
+            <li key={r.id}>
+              {r.title} by {r.author}{" "}
+              <button onClick={() => handleReturn(r.id)}>Return</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
-
-export default AccountPage;

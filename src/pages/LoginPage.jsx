@@ -1,44 +1,24 @@
-import { useState, useContext } from "react";
-import { loginUser } from "../api/users";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
-function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function LoginPage() {
   const { setToken } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [input, setInput] = useState("");
 
-  async function handleLogin(e) {
-    e.preventDefault();
-
-    const data = await loginUser({ email, password });
-    if (data.token) {
-      setToken(data.token);
-      navigate("/account");
-    } else alert("Login failed");
-  }
+  const handleLogin = () => {
+    setToken(input); // set token directly
+    alert("Logged in!");
+  };
 
   return (
-    <form onSubmit={handleLogin}>
+    <div>
       <h1>Login</h1>
-
       <input
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Enter token"
       />
-
-      <input
-        placeholder="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button>Login</button>
-    </form>
+      <button onClick={handleLogin}>Login</button>
+    </div>
   );
 }
-
-export default LoginPage;

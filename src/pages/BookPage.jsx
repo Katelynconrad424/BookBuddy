@@ -1,42 +1,40 @@
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import { getBook, reserveBook } from "../api/books";
+import { getBookDetails } from "../api/books";
+import { reserveBook } from "../api/reservations";
 import { AuthContext } from "../context/AuthContext";
 
-function BookPage() {
+export default function BookPage() {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
   const { token } = useContext(AuthContext);
+  const [book, setBook] = useState(null);
 
   useEffect(() => {
-    async function loadBook() {
-      const data = await getBook(id);
+    async function fetchBook() {
+      const data = await getBookDetails(id);
       setBook(data);
     }
-    loadBook();
+    fetchBook();
   }, [id]);
 
-  async function handleReserve() {
-    if (!token) return alert("You must be logged in");
-    await reserveBook(id, token);
+  const handleReserve = async () => {
+    if (!token) return alert("Login first!");
+    await reserveBook(token, id);
     alert("Book reserved!");
-  }
+  };
 
-  if (!book) return <p>Loading...</p>;
+  if (!book) return <p>Loading book...</p>;
 
   return (
     <div>
       <h1>{book.title}</h1>
+      <p>
+        <strong>Author:</strong> {book.author}
+      </p>
       <p>{book.description}</p>
-      <p>Status: {book.available ? "Available" : "Reserved"}</p>
-
-      {token && book.available && (
-        <button onClick={handleReserve}>Reserve</button>
-      )}
-
-      {token && !book.available && <button disabled>Not Available</button>}
+      <button onClick={handleReserve} disabled={!token || book.reserved}>
+        {book.reserved ? "Already Reserved" : "Reserve"}
+      </button>
     </div>
   );
 }
-
-export default BookPage;

@@ -1,26 +1,33 @@
-import { useEffect, useState } from "react";
-import { getAllBooks } from "../api/books";
-import BookCard from "../components/BookCard";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getBooks } from "../api/books";
 
-function CatalogPage() {
+export default function CatalogPage() {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    async function loadBooks() {
-      const data = await getAllBooks();
+    async function fetchBooks() {
+      const data = await getBooks();
       setBooks(data);
     }
-    loadBooks();
+    fetchBooks();
   }, []);
 
   return (
     <div>
-      <h1>Book Catalog</h1>
-      {books.map((book) => (
-        <BookCard key={book.id} book={book} />
-      ))}
+      <h1>Catalog</h1>
+      {books.length === 0 ? (
+        <p>Loading books...</p>
+      ) : (
+        <ul>
+          {books.map((book) => (
+            <li key={book.id}>
+              <Link to={`/books/${book.id}`}>{book.title}</Link> by{" "}
+              {book.author}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
-
-export default CatalogPage;

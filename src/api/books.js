@@ -1,31 +1,19 @@
-const API = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/books"; // USE THIS
+const API_URL = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/books";
 
-export async function getAllBooks() {
-  const res = await fetch(`${API}/books`);
-  return res.json();
+export async function getBooks() {
+  try {
+    const res = await fetch(API_URL);
+    return res.ok ? res.json() : [];
+  } catch {
+    return [];
+  }
 }
 
-export async function getBook(id) {
-  const res = await fetch(`${API}/books/${id}`);
-  return res.json();
-}
-
-export async function reserveBook(id, token) {
-  const res = await fetch(`${API}/books/${id}/reserve`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.json();
-}
-
-export async function returnBook(id, token) {
-  const res = await fetch(`${API}/books/${id}/return`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.json();
+export async function getBookDetails(id) {
+  try {
+    const res = await fetch(`${API_URL}/${id}`);
+    return res.ok ? res.json() : null;
+  } catch {
+    return null;
+  }
 }
