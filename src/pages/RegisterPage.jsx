@@ -4,7 +4,7 @@ export default function RegisterPage() {
   return (
     <div>
       <h1>Register</h1>
-      <p>Registration form placeholder.</p>
+      <p>Registration form placeholder</p>
     </div>
   );
 }

@@ -7,14 +7,14 @@ export default function BookCard({ book, onReserved }) {
   const { token } = useContext(AuthContext);
 
   const handleReserve = async () => {
-    if (!token) return alert("Please log in first!");
+    if (!token) return alert("Login first!");
     await reserveBook(token, book.id);
     alert("Book reserved!");
-    if (onReserved) onReserved(book.id); // callback to refresh parent state
+    if (onReserved) onReserved(book.id);
   };
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "10px", margin: "5px" }}>
+    <div className="book-card">
       <h3>{book.title}</h3>
       <p>{book.author}</p>
       <Link to={`/books/${book.id}`}>View Details</Link>

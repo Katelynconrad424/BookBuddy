@@ -1,47 +1,44 @@
-import React, { useEffect, useState, useContext } from "react";
-import { getReservations } from "../api/reservations";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { getReservations, returnBook } from "../api/reservations";
 
 export default function ReservationsPage() {
-  const { token } = useContext(AuthContext); // get token from context
+  const { token } = useContext(AuthContext);
   const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true); // show loading message
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       if (!token) {
-        setReservations([]);
         setLoading(false);
         return;
       }
-
-      try {
-        const data = await getReservations(token);
-        setReservations(data);
-      } catch (error) {
-        console.error(error);
-        setReservations([]);
-      } finally {
-        setLoading(false);
-      }
+      const data = await getReservations(token);
+      setReservations(data);
+      setLoading(false);
     }
-
     fetchData();
   }, [token]);
 
-  if (!token) return <p>Please log in to view your reservations.</p>;
+  if (!token) return <p>Please log in to see reservations.</p>;
   if (loading) return <p>Loading reservations...</p>;
+
+  const handleReturn = async (bookId) => {
+    await returnBook(token, bookId);
+    setReservations(reservations.filter((r) => r.id !== bookId));
+  };
 
   return (
     <div>
-      <h1>Your Reservations</h1>
+      <h1>My Reservations</h1>
       {reservations.length === 0 ? (
-        <p>You have no reservations yet.</p>
+        <p>No reservations yet.</p>
       ) : (
         <ul>
           {reservations.map((r) => (
             <li key={r.id}>
-              <strong>{r.title}</strong> by {r.author}
+              {r.title} by {r.author}
+              <button onClick={() => handleReturn(r.id)}>Return</button>
             </li>
           ))}
         </ul>

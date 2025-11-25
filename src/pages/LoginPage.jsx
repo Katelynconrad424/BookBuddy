@@ -6,7 +6,7 @@ export default function LoginPage() {
   const [input, setInput] = useState("");
 
   const handleLogin = () => {
-    setToken(input); // set token directly
+    setToken(input);
     alert("Logged in!");
   };
 

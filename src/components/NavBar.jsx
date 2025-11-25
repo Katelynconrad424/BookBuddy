@@ -6,7 +6,7 @@ export default function Navbar() {
   const { token, setToken } = useContext(AuthContext);
 
   return (
-    <nav style={{ padding: "10px", background: "#eee" }}>
+    <nav>
       <Link to="/">Catalog</Link> | <Link to="/reservations">Reservations</Link>{" "}
       | <Link to="/account">Account</Link> |{" "}
       {token ? (
