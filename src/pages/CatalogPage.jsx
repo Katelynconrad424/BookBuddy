@@ -1,34 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { getBooks } from "../api/books";
+import { useEffect, useState } from "react";
+import { fetchAllBooks } from "../api/books";
+import { Link } from "react-router-dom";
 import BookCard from "../components/BookCard";
 
 export default function CatalogPage() {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    async function fetchBooks() {
-      const data = await getBooks();
+    async function load() {
+      const data = await fetchAllBooks();
       setBooks(data);
     }
-    fetchBooks();
+    load();
   }, []);
 
-  const handleReserved = (bookId) => {
-    setBooks(
-      books.map((b) => (b.id === bookId ? { ...b, reserved: true } : b))
-    );
-  };
-
   return (
-    <div>
+    <div className="page">
       <h1>Catalog</h1>
-      {books.length === 0 ? (
-        <p>Loading books...</p>
-      ) : (
-        books.map((book) => (
-          <BookCard key={book.id} book={book} onReserved={handleReserved} />
-        ))
-      )}
+
+      {books.map((book) => (
+        <Link key={book.id} to={`/books/${book.id}`}>
+          <BookCard book={book} />
+        </Link>
+      ))}
     </div>
   );
 }

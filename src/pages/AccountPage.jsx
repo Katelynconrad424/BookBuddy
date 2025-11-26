@@ -1,42 +1,47 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { getReservations, returnBook } from "../api/reservations";
+import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { getMyReservations, returnBook } from "../api/reservations";
 
 export default function AccountPage() {
-  const { token } = useContext(AuthContext);
+  const { user, token } = useAuth();
   const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
-    async function fetchReservations() {
-      if (!token) return;
-      const data = await getReservations(token);
-      setReservations(data);
+    async function load() {
+      if (token) {
+        const data = await getMyReservations(token);
+        setReservations(data);
+      }
     }
-    fetchReservations();
+    load();
   }, [token]);
 
-  const handleReturn = async (bookId) => {
-    await returnBook(token, bookId);
-    setReservations(reservations.filter((r) => r.id !== bookId));
-  };
+  async function handleReturn(resId) {
+    await returnBook(resId, token);
+    setReservations(reservations.filter((r) => r.id !== resId));
+  }
 
-  if (!token) return <p>Please log in to see your account.</p>;
+  if (!user) return <p>Please log in first.</p>;
 
   return (
-    <div>
-      <h1>My Reservations</h1>
-      {reservations.length === 0 ? (
-        <p>No reservations yet.</p>
-      ) : (
-        <ul>
-          {reservations.map((r) => (
-            <li key={r.id}>
-              {r.title} by {r.author}
-              <button onClick={() => handleReturn(r.id)}>Return</button>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="page">
+      <h1>Your Account</h1>
+
+      <p>
+        <b>Name:</b> {user.name}
+      </p>
+      <p>
+        <b>Email:</b> {user.email}
+      </p>
+
+      <h2>Your Reservations</h2>
+
+      {reservations.map((r) => (
+        <div className="reservation-box" key={r.id}>
+          <p>{r.book.title}</p>
+          <button onClick={() => handleReturn(r.id)}>Return Book</button>
+        </div>
+      ))}
     </div>
   );
 }

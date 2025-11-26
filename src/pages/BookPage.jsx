@@ -1,39 +1,45 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBookDetails } from "../api/books";
+import { fetchBookById } from "../api/books";
 import { reserveBook } from "../api/reservations";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function BookPage() {
   const { id } = useParams();
-  const { token } = useContext(AuthContext);
   const [book, setBook] = useState(null);
+  const { token } = useAuth();
 
   useEffect(() => {
-    async function fetchBook() {
-      const data = await getBookDetails(id);
+    async function load() {
+      const data = await fetchBookById(id);
       setBook(data);
     }
-    fetchBook();
+    load();
   }, [id]);
 
-  const handleReserve = async () => {
-    if (!token) return alert("Login first!");
-    await reserveBook(token, id);
-    alert("Book reserved!");
-  };
+  async function handleReserve() {
+    if (!token) {
+      alert("You must log in first!");
+      return;
+    }
 
-  if (!book) return <p>Loading book...</p>;
+    const result = await reserveBook(book.id, token);
+    alert(result.message || "Book reserved!");
+  }
+
+  if (!book) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="page">
       <h1>{book.title}</h1>
-      <p>
-        <strong>Author:</strong> {book.author}
-      </p>
+      <p>by {book.author}</p>
+
+      <img src={book.coverImage} alt="" width="150" />
+
       <p>{book.description}</p>
-      <button onClick={handleReserve} disabled={!token || book.reserved}>
-        {book.reserved ? "Already Reserved" : "Reserve"}
+
+      <button onClick={handleReserve}>
+        {book.isReserved ? "Already Reserved" : "Reserve Book"}
       </button>
     </div>
   );

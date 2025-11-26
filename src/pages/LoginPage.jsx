@@ -1,24 +1,38 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { setToken } = useContext(AuthContext);
-  const [input, setInput] = useState("");
+  const { login } = useAuth();
+  const [form, setForm] = useState({ username: "", password: "" });
 
-  const handleLogin = () => {
-    setToken(input);
-    alert("Logged in!");
-  };
+  function update(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    const result = await login(form);
+
+    if (result.token) {
+      alert("Logged in!");
+    } else {
+      alert("Login failed.");
+    }
+  }
 
   return (
-    <div>
+    <form className="page" onSubmit={submit}>
       <h1>Login</h1>
+
+      <input name="username" placeholder="Username" onChange={update} />
       <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter token"
+        name="password"
+        type="password"
+        placeholder="Password"
+        onChange={update}
       />
-      <button onClick={handleLogin}>Login</button>
-    </div>
+
+      <button>Log In</button>
+    </form>
   );
 }

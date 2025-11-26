@@ -1,21 +1,46 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { fetchAccount, loginUser } from "../api/users";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
+    async function loadAccount() {
+      if (token) {
+        const account = await fetchAccount(token);
+        setUser(account);
+      }
     }
+    loadAccount();
   }, [token]);
 
+  async function login(formData) {
+    const result = await loginUser(formData);
+
+    if (result.token) {
+      setToken(result.token);
+      localStorage.setItem("token", result.token);
+    }
+
+    return result;
+  }
+
+  function logout() {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+  }
+
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider value={{ token, user, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
 }
