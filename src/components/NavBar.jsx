@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+//Link switches pages without reloading the site.
+//useAuth gives access to:
+//the user’s token (are they logged in?)
+//the logout function.
 export default function NavBar() {
   const { token, logout } = useAuth();
 
@@ -14,7 +17,7 @@ export default function NavBar() {
           <Link to="/register">Register</Link>
         </>
       )}
-
+      {/*So the user can sign in or create an account. */}
       {token && (
         <>
           <Link to="/reservations">My Reservations</Link>
@@ -27,3 +30,7 @@ export default function NavBar() {
     </nav>
   );
 }
+//So the user can:
+//View their reservations
+//View their account details
+//Logout

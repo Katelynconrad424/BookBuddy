@@ -9,3 +9,7 @@ export default function BookCard({ book }) {
     </div>
   );
 }
+//Shows the book’s cover image
+//Shows the book’s title
+//Shows the author
+//Wraps them inside a <div> with a class for styling
